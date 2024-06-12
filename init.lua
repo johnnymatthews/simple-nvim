@@ -20,5 +20,6 @@ vim.opt.rtp:prepend(lazypath)
 
 require "plugins"
 
+vim.o.termguicolors = true
 -- vim.cmd "colorscheme catppuccin-latte"
 vim.cmd "colorscheme catppuccin-mocha"
