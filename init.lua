@@ -20,5 +20,5 @@ vim.opt.rtp:prepend(lazypath)
 
 require "plugins"
 
-vim.cmd "colorscheme catppuccin-mocha"
 -- vim.cmd "colorscheme catppuccin-latte"
+vim.cmd "colorscheme catppuccin-mocha"
