@@ -65,7 +65,6 @@ local plugins = {
   },
 
   -- statusline
-
   {
     "echasnovski/mini.statusline",
     config = function()
@@ -177,6 +176,17 @@ local plugins = {
     lazy = true,
     config = function()
       require("Comment").setup()
+    end,
+  },
+
+  -- undo tree.
+  {
+    "jiaoshijie/undotree",
+    dependencies  = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      require "plugins.configs.undotree"
     end,
   },
 }

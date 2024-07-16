@@ -34,3 +34,10 @@ end)
 
 -- float terminal
 map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>")
+
+-- Make :W work like :w and :Q work like :q
+vim.cmd('cnoreabbrev W w')
+vim.cmd('cnoreabbrev Q q')
+
+-- Toggle undotree.
+map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>")
