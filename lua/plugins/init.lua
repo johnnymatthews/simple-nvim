@@ -1,22 +1,46 @@
 local plugins = {
-  { lazy = true, "nvim-lua/plenary.nvim" },
-
-  {
-    "EdenEast/nightfox.nvim",
-    priority = 1000,
-    config = function()
-      require("nightfox").setup {
-        groups = {
-          all = { VertSplit = { fg = "bg3" } },
-        },
-      }
-    end,
+  -- A bunch of pre-written functions that other plugins make use of.
+  { 
+    "nvim-lua/plenary.nvim",
+    lazy = true
   },
 
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-  {'akinsho/toggleterm.nvim', version = "*", config = true},
 
-  -- file tree
+
+  -- A theme that I don't use. Pretty sure I can delete this.
+  -- {
+  --   "EdenEast/nightfox.nvim",
+  --   priority = 1000,
+  --   config = function()
+  --     require("nightfox").setup {
+  --       groups = {
+  --         all = { VertSplit = { fg = "bg3" } },
+  --       },
+  --     }
+  --   end,
+  -- },
+
+
+
+  -- A theme that I do use, and like very much.
+  { 
+    "catppuccin/nvim", 
+    name = "catppuccin", 
+    priority = 1000 
+  },
+
+
+
+  -- Show a floating terminal to quickly do terminal stuff.
+  {
+    "akinsho/toggleterm.nvim", 
+    version = "*", 
+    config = true
+  },
+
+
+
+  -- A nice sidebar File Tree. Open with CTRL + `n`.
   {
     "nvim-tree/nvim-tree.lua",
     cmd = { "NvimTreeToggle", "NvimTreeFocus" },
@@ -24,7 +48,7 @@ local plugins = {
       require("nvim-tree").setup({
         view = {
           width = 30,
-
+          side = 'right'
         },
         filters = {
           dotfiles = true,
@@ -38,6 +62,8 @@ local plugins = {
     end,
   },
 
+
+
   -- icons, for UI related plugins
   {
     "nvim-tree/nvim-web-devicons",
@@ -45,6 +71,8 @@ local plugins = {
       require("nvim-web-devicons").setup()
     end,
   },
+
+
 
   -- syntax highlighting
   {
@@ -55,6 +83,8 @@ local plugins = {
     end,
   },
 
+
+
   -- buffer + tab line
   {
     "akinsho/bufferline.nvim",
@@ -64,6 +94,8 @@ local plugins = {
     end,
   },
 
+
+
   -- statusline
   {
     "echasnovski/mini.statusline",
@@ -71,6 +103,8 @@ local plugins = {
       require("mini.statusline").setup { set_vim_settings = false }
     end,
   },
+
+
 
   -- we use cmp plugin only when in insert mode
   -- so lets lazyload it at InsertEnter event, to know all the events check h-events
