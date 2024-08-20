@@ -34,7 +34,7 @@ end)
 
 -- float terminal
 map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>")
-map("n", "<leader>fg", "<cmd> TermExec cmd='lazygit' direction=float lazygit<CR>")
+map("n", "<leader>fg", "<cmd>TermExec cmd='lazygit && exit' direction=float<CR>")
 
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
