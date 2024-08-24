@@ -7,21 +7,6 @@ local plugins = {
 
 
 
-  -- A theme that I don't use. Pretty sure I can delete this.
-  -- {
-  --   "EdenEast/nightfox.nvim",
-  --   priority = 1000,
-  --   config = function()
-  --     require("nightfox").setup {
-  --       groups = {
-  --         all = { VertSplit = { fg = "bg3" } },
-  --       },
-  --     }
-  --   end,
-  -- },
-
-
-
   -- A theme that I do use, and like very much.
   { 
     "catppuccin/nvim", 
