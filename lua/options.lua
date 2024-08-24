@@ -6,7 +6,7 @@ opt.laststatus = 3 -- global statusline
 opt.showmode = false
 
 opt.clipboard = ""
-opt.scrolloff= 999
+opt.scrolloff= 15
 
 -- Indenting
 opt.expandtab = true
