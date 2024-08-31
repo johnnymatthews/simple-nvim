@@ -2,7 +2,7 @@
 
 A straightforward Neovim configuration that should work for _most_ developers. Cloned from NvChad's [Tinyvim](https://github.com/NvChad/tinyvim).
 
-<img width="1280" alt="image" src="https://github.com/johnnymatthews/simple-nvim/assets/9611008/02483a5e-c9a7-43f0-93ec-463243179b53">
+<img width="1486" alt="Screenshot 2024-08-31 at 10 15 59 AM" src="https://github.com/user-attachments/assets/399c779d-9b1f-493b-b06a-45e4153102cd">
 
 ## Features
 
