@@ -1,44 +1,28 @@
 local map = vim.keymap.set
 
--- general mappings
-map("n", "<C-s>", "<cmd> w <CR>")
-map("i", "jk", "<ESC>")
-map("n", "<C-c>", "<cmd> %y+ <CR>") -- copy whole filecontent
+-- General
+map("n", "<C-c>", "<cmd> %y+ <CR>") -- Copy current file to clipboard.
 
--- nvimtree
-map("n", "<C-n>", "<cmd> NvimTreeToggle <CR>")
-map("n", "<C-h>", "<cmd> NvimTreeFocus <CR>")
+-- Nvim Tree
+map("n", "<C-n>", "<cmd> NvimTreeToggle <CR>") -- Toggle sidebar navigation.
 
--- telescope
-map("n", "<leader>ff", "<cmd> Telescope find_files <CR>")
-map("n", "<leader>fo", "<cmd> Telescope oldfiles <CR>")
-map("n", "<leader>fw", "<cmd> Telescope live_grep <CR>")
-map("n", "<leader>gt", "<cmd> Telescope git_status <CR>")
+-- Telescope
+map("n", "<leader>ff", "<cmd> Telescope find_files <CR>") -- Find file by filename.
+map("n", "<leader>fo", "<cmd> Telescope oldfiles <CR>") -- Find files that you recently opened.
+map("n", "<leader>fw", "<cmd> Telescope live_grep <CR>") -- Search for files by their content.
 
--- bufferline, cycle buffers
-map("n", "<Tab>", "<cmd> BufferLineCycleNext <CR>")
-map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>")
-map("n", "<C-q>", "<cmd> bd <CR>")
+-- Tabs
+map("n", "<Tab>", "<cmd> BufferLineCycleNext <CR>") -- Move right one tab.
+map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>") -- Move left one tab.
+map("n", "<C-q>", "<cmd> bd <CR>") -- Close a tab.
 
--- comment.nvim
-map("n", "<leader>/", function()
-  require("Comment.api").toggle.linewise.current()
-end)
+-- Floating Terminal
+map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>") -- Open a floating terminal.
+map("n", "<leader>fg", "<cmd>TermExec cmd='lazygit && exit' direction=float<CR>") -- Open a floating Lazygit instance.
 
-map("v", "<leader>/", "<ESC><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>")
-
--- format
-map("n", "<leader>fm", function()
-  require("conform").format()
-end)
-
--- float terminal
-map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>")
-map("n", "<leader>fg", "<cmd>TermExec cmd='lazygit && exit' direction=float<CR>")
+-- Undo tree
+map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
 
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
 vim.cmd('cnoreabbrev Q q')
-
--- Toggle undotree.
-map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>")
