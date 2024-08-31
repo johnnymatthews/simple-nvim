@@ -13,6 +13,7 @@ A straightforward Neovim configuration that should work for _most_ developers. C
 - Basic code completion.
 - Sensible hotkeys.
 - A simple directory structure.
+- Leader key set to `SPACE`.
 
 ## Prerequisities
 
@@ -83,3 +84,21 @@ A straightforward Neovim configuration that should work for _most_ developers. C
     ```
 
     Neovim should download all the extensions, theme files, and dependencies for you.
+
+## Keyboard shortcuts
+
+Most of the keyboard shortcuts (also called _mappings_) for this config can be found within `./lua/mappings.lua`, however some shortcuts are defined within plugins. Here is a complete list of all the keyboard shortcut for this repo (all shortcuts are from `normal` mode, unless otherwise stated):
+
+| Description | Shortcut |
+| ----------- | -------- |
+| Comment or uncomment a line | `gc` |
+| Open or close the sidebar navigation | `CTRL` + `n` |
+| Change focus to or from the sidebar navigation | `CTRL` + `ww` |
+| Copy the current file to the clipboard | `CTRL` + `c` |
+| Find file by filename. | `SPACE` `ff` |
+| Find files that you recently opened. | `SPACE` `fo` |
+| Search for files by their content. | `SPACE` `fw` |
+| Open a Lazygit window | `SPACE` `fg` |
+| Open a floating termial window | `SPACE` `ft` |
+| Close current tab | `CTRL` + `q` |
+| Open or close the undo-tree | `SPACE` `u` |
