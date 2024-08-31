@@ -153,15 +153,6 @@ local plugins = {
     end,
   },
 
-  -- formatting , linting
-  {
-    "stevearc/conform.nvim",
-    lazy = true,
-    config = function()
-      require "plugins.configs.conform"
-    end,
-  },
-
   -- indent lines
   {
     "lukas-reineke/indent-blankline.nvim",
