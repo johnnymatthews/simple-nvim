@@ -22,7 +22,7 @@ opt.laststatus = 3 -- global statusline
 opt.showmode = false
 
 opt.clipboard = ""
-opt.scrolloff= 15
+opt.scrolloff= 999
 
 -- Indenting
 opt.expandtab = true
@@ -362,11 +362,6 @@ local plugins = {
   },
 
   -- Show a floating terminal to quickly do terminal stuff.
-  {
-    "akinsho/toggleterm.nvim", 
-    version = "*", 
-    config = true
-  },
 
   -- A nice sidebar File Tree. Open with CTRL + `n`.
   {
@@ -397,6 +392,52 @@ local plugins = {
       require("nvim-web-devicons").setup()
     end,
   },
+
+  {
+  "akinsho/toggleterm.nvim", 
+  version = "*", 
+  config = function()
+    require("toggleterm").setup({
+      -- Default configuration options
+      size = function(term)
+        if term.direction == "horizontal" then
+
+          return 15
+        elseif term.direction == "vertical" then
+          return vim.o.columns * 0.4
+        end
+      end,
+      open_mapping = [[<c-\>]],
+      hide_numbers = true,
+      shade_filetypes = {},
+      shade_terminals = true,
+      shading_factor = 2,
+
+      start_in_insert = true,
+      insert_mappings = true,
+      persist_size = true,
+      direction = "float",
+
+      close_on_exit = true,
+
+      shell = vim.o.shell,
+      float_opts = {
+        border = "curved",
+        winblend = 0,
+        highlights = {
+          border = "Normal",
+          background = "Normal",
+        },
+      },
+      -- This is the key setting that makes the terminal open in the current directory
+      dir = function()
+        -- Get the directory of the current buffer
+        local buf_dir = vim.fn.expand("%:p:h")
+        return buf_dir
+      end,
+    })
+  end
+},
 
   -- syntax highlighting
   {
