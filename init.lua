@@ -22,7 +22,7 @@ opt.laststatus = 3 -- global statusline
 opt.showmode = false
 
 opt.clipboard = ""
-opt.scrolloff= 999
+opt.scrolloff= 15
 
 -- Indenting
 opt.expandtab = true
@@ -30,6 +30,9 @@ opt.shiftwidth = 2
 opt.smartindent = true
 opt.tabstop = 2
 opt.softtabstop = 2
+
+-- Prevent filetype plugins from changing indentation.
+vim.g.filetype_plugin_indent = false
 
 opt.fillchars = { eob = " " }
 opt.ignorecase = true
@@ -78,7 +81,7 @@ map("n", "<C-q>", "<cmd> bd <CR>") -- Close a tab.
 
 -- Floating Terminal
 map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>") -- Open a floating terminal.
-map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cmd='lazygit', direction='float', dir=vim.fn.expand('%:p:h')}):toggle()<CR>")
+map("n", "<leader>fg", "<cmd>TermExec cmd='lazygit && exit' direction=float<CR>") -- Open a floating Lazygit instance.
 
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
@@ -362,6 +365,11 @@ local plugins = {
   },
 
   -- Show a floating terminal to quickly do terminal stuff.
+  {
+    "akinsho/toggleterm.nvim", 
+    version = "*", 
+    config = true
+  },
 
   -- A nice sidebar File Tree. Open with CTRL + `n`.
   {
@@ -392,52 +400,6 @@ local plugins = {
       require("nvim-web-devicons").setup()
     end,
   },
-
-  {
-  "akinsho/toggleterm.nvim", 
-  version = "*", 
-  config = function()
-    require("toggleterm").setup({
-      -- Default configuration options
-      size = function(term)
-        if term.direction == "horizontal" then
-
-          return 15
-        elseif term.direction == "vertical" then
-          return vim.o.columns * 0.4
-        end
-      end,
-      open_mapping = [[<c-\>]],
-      hide_numbers = true,
-      shade_filetypes = {},
-      shade_terminals = true,
-      shading_factor = 2,
-
-      start_in_insert = true,
-      insert_mappings = true,
-      persist_size = true,
-      direction = "float",
-
-      close_on_exit = true,
-
-      shell = vim.o.shell,
-      float_opts = {
-        border = "curved",
-        winblend = 0,
-        highlights = {
-          border = "Normal",
-          background = "Normal",
-        },
-      },
-      -- This is the key setting that makes the terminal open in the current directory
-      dir = function()
-        -- Get the directory of the current buffer
-        local buf_dir = vim.fn.expand("%:p:h")
-        return buf_dir
-      end,
-    })
-  end
-},
 
   -- syntax highlighting
   {
@@ -563,12 +525,26 @@ local plugins = {
   },
 }
 
--- Initialize lazy with the plugins
+-- Initialize lazy with the plugins.
 require("lazy").setup(plugins, lazy_config)
 
 --------------------------------------------------------------------------------
 -- THEME SETUP (from init.lua final lines)
 --------------------------------------------------------------------------------
-
+-- Stop Alacritty freaking out.
 vim.o.termguicolors = true
-vim.cmd "colorscheme catppuccin-mocha"
+
+-- Set overarching Catppuccin theme.
+vim.cmd "colorscheme catppuccin-latte"
+
+-- Force indentation to be 2 characters.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.shiftwidth = 2
+    vim.bo.softtabstop = 2
+    vim.bo.expandtab = true
+  end,
+})
+
