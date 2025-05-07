@@ -81,7 +81,7 @@ map("n", "<C-q>", "<cmd> bd <CR>") -- Close a tab.
 
 -- Floating Terminal
 map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>") -- Open a floating terminal.
-map("n", "<leader>fg", "<cmd>TermExec cmd='lazygit && exit' direction=float<CR>") -- Open a floating Lazygit instance.
+map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cmd='lazygit', direction='float', dir=vim.fn.expand('%:p:h')}):toggle()<CR>") -- Open Lazygit in current dir.
 
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
@@ -535,7 +535,7 @@ require("lazy").setup(plugins, lazy_config)
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-latte"
+vim.cmd "colorscheme catppuccin-mocha"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
