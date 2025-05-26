@@ -1,18 +1,5 @@
---[[
-  Simple Nvim - Consolidated Configuration File
-  
-  This file combines all configuration from:
-  - init.lua
-  - lua/options.lua
-  - lua/mappings.lua
-  - lua/commands.lua
-  - lua/plugins/init.lua
-  - and all plugin-specific configuration files
-]]--
-
---------------------------------------------------------------------------------
--- OPTIONS (from lua/options.lua)
---------------------------------------------------------------------------------
+-- OPTIONS
+----------
 
 local opt = vim.opt
 
@@ -24,7 +11,7 @@ opt.showmode = false
 opt.clipboard = ""
 opt.scrolloff= 15
 
--- Indenting
+-- Indenting.
 opt.expandtab = true
 opt.shiftwidth = 2
 opt.smartindent = true
@@ -39,7 +26,7 @@ opt.ignorecase = true
 opt.smartcase = true
 opt.mouse = "a"
 
--- Numbers
+-- Numbers.
 opt.number = true
 opt.relativenumber = true
 opt.ruler = false
@@ -53,13 +40,15 @@ opt.undofile = true
 opt.timeoutlen = 400
 opt.updatetime = 250
 
--- add binaries installed by mason.nvim to path
+-- add binaries installed by mason.nvim to path.
 local is_windows = vim.loop.os_uname().sysname == "Windows_NT"
 vim.env.PATH = vim.env.PATH .. (is_windows and ";" or ":") .. vim.fn.stdpath "data" .. "/mason/bin"
+----------
 
---------------------------------------------------------------------------------
--- MAPPINGS (from lua/mappings.lua)
---------------------------------------------------------------------------------
+
+
+-- MAPPINGS
+-----------
 
 local map = vim.keymap.set
 
@@ -89,19 +78,23 @@ map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hi
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
 vim.cmd('cnoreabbrev Q q')
+-----------
 
---------------------------------------------------------------------------------
--- COMMANDS (from lua/commands.lua)
---------------------------------------------------------------------------------
+
+
+-- COMMANDS
+-----------
 
 -- mason, write correct names only
 vim.api.nvim_create_user_command("MasonInstallAll", function()
   vim.cmd "MasonInstall css-lsp html-lsp lua-language-server typescript-language-server stylua prettier"
 end, {})
+-----------
 
---------------------------------------------------------------------------------
--- PLUGINS AND LAZY.NVIM SETUP (from init.lua and lua/plugins/init.lua)
---------------------------------------------------------------------------------
+
+
+-- PLUGINS AND LAZY.NVIM SETUP
+------------------------------
 
 -- bootstrap plugins & lazy.nvim
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim" -- path where its going to be installed
@@ -128,7 +121,11 @@ local bufferline_config = function()
     options = {
       themable = true,
       offsets = {
-        { filetype = "NvimTree", highlight = "NvimTreeNormal" },
+        { 
+          filetype = "NvimTree", 
+          highlight = "NvimTreeNormal",
+          separator = true  -- Add separator for better visual separation
+        },
       },
     },
   }
@@ -377,12 +374,22 @@ local plugins = {
     cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     config = function()
       require("nvim-tree").setup({
+        disable_netrw = true,
+        hijack_netrw = true,
         view = {
           width = 30,
           side = 'right'
         },
+        renderer = {
+          highlight_git = true,
+          icons = {
+            show = {
+              git = true,
+            },
+          },
+        },
         filters = {
-          dotfiles = true,
+          dotfiles = false,
         },
         git = {
           enable = true,
@@ -527,10 +534,13 @@ local plugins = {
 
 -- Initialize lazy with the plugins.
 require("lazy").setup(plugins, lazy_config)
+------------------------------
 
---------------------------------------------------------------------------------
--- THEME SETUP (from init.lua final lines)
---------------------------------------------------------------------------------
+
+
+-- THEME SETUP
+--------------
+
 -- Stop Alacritty freaking out.
 vim.o.termguicolors = true
 
@@ -547,4 +557,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo.expandtab = true
   end,
 })
-
