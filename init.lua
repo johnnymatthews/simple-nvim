@@ -54,6 +54,7 @@ local map = vim.keymap.set
 
 -- General
 map("n", "<C-c>", "<cmd> %y+ <CR>") -- Copy current file to clipboard.
+map("v", "<C-c>", '"+y', { noremap = true, silent = true }) -- Copy highlighted text to clipboard.
 
 -- Nvim Tree
 map("n", "<C-n>", "<cmd> NvimTreeToggle <CR>") -- Toggle sidebar navigation.
@@ -66,7 +67,20 @@ map("n", "<leader>fw", "<cmd> Telescope live_grep <CR>") -- Search for files by 
 -- Tabs
 map("n", "<Tab>", "<cmd> BufferLineCycleNext <CR>") -- Move right one tab.
 map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>") -- Move left one tab.
-map("n", "<C-q>", "<cmd> bd <CR>") -- Close a tab.
+map("n", "<C-q>", function() -- Close a tab.
+  local bufnr = vim.api.nvim_get_current_buf()
+  local buffers = vim.fn.getbufinfo({buflisted = 1})
+  
+  -- If there are other buffers, switch to the next one before closing
+  if #buffers > 1 then
+    vim.cmd("BufferLineCycleNext")
+    vim.cmd("bd " .. bufnr)
+  else
+    -- If this is the last buffer, close it normally
+    vim.cmd("bd")
+  end
+end, { desc = "Close current buffer" })
+
 
 -- Floating Terminal
 map("n", "<leader>ft", "<cmd> ToggleTerm direction=float<CR>") -- Open a floating terminal.
@@ -138,6 +152,29 @@ local telescope_config = function()
       sorting_strategy = "ascending",
       layout_config = {
         horizontal = { prompt_position = "top" },
+      },
+      file_ignore_patterns = {
+        "node_modules/.*",
+        "%.git/.*",
+        "%.DS_Store",
+        "package%-lock%.json",
+        "yarn%.lock",
+        "dist/.*",
+        "build/.*",
+        "%.log",
+        "%.tmp",
+        "%.temp",
+      },
+    },
+    pickers = {
+      find_files = {
+        hidden = false,
+        find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*", "--glob", "!**/node_modules/*" },
+      },
+      live_grep = {
+        additional_args = function()
+          return { "--hidden", "--glob", "!**/.git/*", "--glob", "!**/node_modules/*" }
+        end,
       },
     },
   }
@@ -545,7 +582,7 @@ require("lazy").setup(plugins, lazy_config)
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-mocha"
+vim.cmd "colorscheme catppuccin-latte"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
