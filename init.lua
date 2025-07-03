@@ -56,6 +56,17 @@ local map = vim.keymap.set
 map("n", "<C-c>", "<cmd> %y+ <CR>") -- Copy current file to clipboard.
 map("v", "<C-c>", '"+y', { noremap = true, silent = true }) -- Copy highlighted text to clipboard.
 
+-- Word wrap toggle
+map("n", "<leader>ww", function()
+  if vim.wo.wrap then
+    vim.wo.wrap = false
+    print("Word wrap disabled")
+  else
+    vim.wo.wrap = true
+    print("Word wrap enabled")
+  end
+end, { desc = "Toggle word wrap" })
+
 -- Nvim Tree
 map("n", "<C-n>", "<cmd> NvimTreeToggle <CR>") -- Toggle sidebar navigation.
 
