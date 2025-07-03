@@ -56,6 +56,17 @@ local map = vim.keymap.set
 map("n", "<C-c>", "<cmd> %y+ <CR>") -- Copy current file to clipboard.
 map("v", "<C-c>", '"+y', { noremap = true, silent = true }) -- Copy highlighted text to clipboard.
 
+-- Word wrap toggle
+map("n", "<leader>ww", function()
+  if vim.wo.wrap then
+    vim.wo.wrap = false
+    print("Word wrap disabled")
+  else
+    vim.wo.wrap = true
+    print("Word wrap enabled")
+  end
+end, { desc = "Toggle word wrap" })
+
 -- Nvim Tree
 map("n", "<C-n>", "<cmd> NvimTreeToggle <CR>") -- Toggle sidebar navigation.
 
@@ -188,7 +199,17 @@ end
 -- Treesitter Configuration
 local treesitter_config = function()
   require("nvim-treesitter.configs").setup {
-    ensure_installed = { "lua", "vim", "vimdoc", "tsx", "html", "css", "typescript", "javascript" },
+    ensure_installed = { 
+      "css", 
+      "html", 
+      "javascript", 
+      "lua", 
+      "markdown", 
+      "tsx", 
+      "typescript", 
+      "vim", 
+      "vimdoc", 
+    },
     highlight = {
       enable = true,
       use_languagetree = true,
@@ -596,7 +617,7 @@ require("lazy").setup(plugins, lazy_config)
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-latte"
+vim.cmd "colorscheme catppuccin-mocha"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
@@ -606,5 +627,13 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo.shiftwidth = 2
     vim.bo.softtabstop = 2
     vim.bo.expandtab = true
+  end,
+})
+
+-- Treat MDX files as Markdown files
+vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
+  pattern = "*.mdx",
+  callback = function()
+    vim.bo.filetype = "markdown"
   end,
 })
