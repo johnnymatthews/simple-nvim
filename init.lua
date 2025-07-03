@@ -89,6 +89,11 @@ map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cm
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
 
+-- Claude Code
+map("n", "<C-,>", "<cmd>ClaudeCode<CR>") -- Toggle Claude Code terminal.
+map("n", "<leader>cC", "<cmd>ClaudeCodeContinue<CR>") -- Continue conversation.
+map("n", "<leader>cV", "<cmd>ClaudeCodeVerbose<CR>") -- Verbose mode.
+
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
 vim.cmd('cnoreabbrev Q q')
@@ -566,6 +571,15 @@ local plugins = {
       "nvim-lua/plenary.nvim",
     },
     config = undotree_config,
+  },
+
+  -- claude-code.nvim integration
+  {
+    "greggh/claude-code.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("claude-code").setup()
+    end,
   },
 }
 

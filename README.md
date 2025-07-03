@@ -58,6 +58,16 @@ There are only a few things you'll need to install.
     sudo pacman -S lazygit
     ```
 
+- [Claude Code](https://claude.ai/code) if you want to use the integrated AI assistant:
+
+    ```shell
+    # Install Claude Code
+    npm install -g @anthropic/claude-code
+    
+    # Login to Claude Code
+    claude-code login
+    ```
+
 ## Install
 
 This whole setup is just a single file, so installing it is pretty straightforward.
@@ -97,21 +107,106 @@ This configuration uses a minimal approach with just a single file:
 
 ## Keyboard shortcuts
 
-All keyboard shortcuts (also called _mappings_) for this config can be found within the `MAPPINGS` section of the `init.lua` file. Here is a complete list of all the keyboard shortcuts (all shortcuts are from `normal` mode, unless otherwise stated):
+All keyboard shortcuts (also called _mappings_) for this config can be found within the `MAPPINGS` section of the `init.lua` file. Here is a complete list of all the keyboard shortcuts:
 
-| Description | Shortcut |
-| ----------- | -------- |
-| Comment or uncomment a line | `gc` |
-| Open or close the sidebar navigation | `CTRL` + `n` |
-| Change focus to or from the sidebar navigation | `CTRL` + `ww` |
-| Copy the current file to the clipboard | `CTRL` + `c` |
-| Find file by filename. | `SPACE` `ff` |
-| Find files that you recently opened. | `SPACE` `fo` |
-| Search for files by their content. | `SPACE` `fw` |
-| Open a Lazygit window | `SPACE` `fg` |
-| Open a floating terminal window | `SPACE` `ft` |
-| Close current tab | `CTRL` + `q` |
-| Open or close the undo-tree | `SPACE` `u` |
+**Leader Key:** `<Space>`
+
+### General
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<C-c>` | Normal | Copy current file to clipboard |
+| `<C-c>` | Visual | Copy highlighted text to clipboard |
+
+### File Navigation
+
+#### Nvim Tree
+| Key | Mode | Action |
+|-----|------|--------|
+| `<C-n>` | Normal | Toggle sidebar navigation |
+
+#### Telescope
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>ff` | Normal | Find file by filename |
+| `<leader>fo` | Normal | Find files that you recently opened |
+| `<leader>fw` | Normal | Search for files by their content |
+
+### Buffer/Tab Management
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<Tab>` | Normal | Move right one tab |
+| `<S-Tab>` | Normal | Move left one tab |
+| `<C-q>` | Normal | Close current buffer |
+
+### Terminal
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>ft` | Normal | Open a floating terminal |
+| `<leader>fg` | Normal | Open Lazygit in current directory |
+
+### Undo Tree
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>u` | Normal | Show or hide Undotree on the left |
+
+### Claude Code Integration
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<C-,>` | Normal | Toggle Claude Code terminal |
+| `<leader>cC` | Normal | Continue conversation |
+| `<leader>cV` | Normal | Verbose mode |
+
+### LSP (Language Server Protocol)
+
+#### Global Diagnostics
+| Key | Mode | Action |
+|-----|------|--------|
+| `<space>e` | Normal | Open floating diagnostic |
+| `[d` | Normal | Go to previous diagnostic |
+| `]d` | Normal | Go to next diagnostic |
+| `<space>q` | Normal | Set location list |
+
+#### LSP Attached Buffer (Available when LSP is active)
+| Key | Mode | Action |
+|-----|------|--------|
+| `gD` | Normal | Go to declaration |
+| `gd` | Normal | Go to definition |
+| `K` | Normal | Hover documentation |
+| `gi` | Normal | Go to implementation |
+| `<C-k>` | Normal | Signature help |
+| `<space>wa` | Normal | Add workspace folder |
+| `<space>wr` | Normal | Remove workspace folder |
+| `<space>wl` | Normal | List workspace folders |
+| `<space>D` | Normal | Type definition |
+| `<space>rn` | Normal | Rename symbol |
+| `<space>ca` | Normal/Visual | Code action |
+| `gr` | Normal | Go to references |
+
+### Command Abbreviations
+
+| Command | Expands To |
+|---------|------------|
+| `:W` | `:w` |
+| `:Q` | `:q` |
+
+### Additional Plugin Commands
+
+In addition to the keybindings, the following commands are available:
+
+- `:ClaudeCode` - Toggle Claude Code terminal
+- `:ClaudeCodeContinue` - Resume recent conversation
+- `:ClaudeCodeResume` - Show conversation picker
+- `:ClaudeCodeVerbose` - Enable verbose logging
+- `:MasonInstallAll` - Install all configured LSP servers
+- `:NvimTreeToggle` - Toggle file tree
+- `:NvimTreeFocus` - Focus file tree
+- `:ToggleTerm` - Toggle terminal
+- `:Telescope` - Access Telescope commands
 
 ## Customising
 
