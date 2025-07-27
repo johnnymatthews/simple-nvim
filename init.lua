@@ -212,7 +212,7 @@ local treesitter_config = function()
     },
     highlight = {
       enable = true,
-      use_languagetree = true,
+      use_languagetree = false,
     },
     indent = { enable = true },
   }
@@ -485,6 +485,16 @@ local plugins = {
     config = bufferline_config,
   },
 
+  -- easy titlecase
+  {
+    "christoomey/vim-titlecase",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      vim.keymap.set("n", "<leader>tc", "gzz", { desc = "Title case current line" })
+      vim.keymap.set("v", "<leader>tc", "gz", { desc = "Title case selection" })
+    end,
+  },
+
   -- statusline
   {
     "echasnovski/mini.statusline",
@@ -617,7 +627,7 @@ require("lazy").setup(plugins, lazy_config)
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-mocha"
+vim.cmd "colorscheme catppuccin-latte"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
