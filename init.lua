@@ -211,8 +211,7 @@ local treesitter_config = function()
       "vimdoc", 
     },
     highlight = {
-      enable = true,
-      use_languagetree = false,
+      enable = true
     },
     indent = { enable = true },
   }
