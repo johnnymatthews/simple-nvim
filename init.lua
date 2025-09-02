@@ -100,10 +100,28 @@ map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cm
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
 
--- Claude Code
-map("n", "<C-,>", "<cmd>ClaudeCode<CR>") -- Toggle Claude Code terminal.
-map("n", "<leader>cC", "<cmd>ClaudeCodeContinue<CR>") -- Continue conversation.
-map("n", "<leader>cV", "<cmd>ClaudeCodeVerbose<CR>") -- Verbose mode.
+-- Harper Grammar Checker keymaps
+map("n", "<leader>hh", function()
+  vim.lsp.buf.code_action({
+    filter = function(action)
+      return string.match(action.title, "^Harper:")
+    end,
+    apply = true,
+  })
+end, { desc = "Apply Harper grammar suggestions" })
+
+map("n", "<leader>hd", vim.diagnostic.open_float, { desc = "Show Harper diagnostics" })
+
+-- Toggle diagnostics visibility
+map("n", "<leader>ht", function()
+  if vim.diagnostic.is_disabled() then
+    vim.diagnostic.enable()
+    print("Harper diagnostics enabled")
+  else
+    vim.diagnostic.disable()
+    print("Harper diagnostics disabled")
+  end
+end, { desc = "Toggle Harper diagnostics" })
 
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
@@ -117,7 +135,7 @@ vim.cmd('cnoreabbrev Q q')
 
 -- mason, write correct names only
 vim.api.nvim_create_user_command("MasonInstallAll", function()
-  vim.cmd "MasonInstall css-lsp html-lsp lua-language-server typescript-language-server stylua prettier"
+  vim.cmd "MasonInstall css-lsp html-lsp lua-language-server typescript-language-server stylua prettier harper-ls"
 end, {})
 -----------
 
@@ -356,6 +374,20 @@ local lspconfig_setup = function()
     settings = {
       Lua = {
         diagnostics = { globals = { "vim" } },
+      },
+    },
+  }
+
+  -- Setup Harper Language Server for grammar checking
+  lspconfig.harper_ls.setup {
+    capabilities = capabilities,
+    filetypes = {
+      "markdown",
+      "text",
+    },
+    settings = {
+      ["harper-ls"] = {
+        userDictPath = "~/.config/harper-ls/user.dict",  -- Custom dictionary path
       },
     },
   }
@@ -602,15 +634,6 @@ local plugins = {
     },
     config = undotree_config,
   },
-
-  -- claude-code.nvim integration
-  {
-    "greggh/claude-code.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      require("claude-code").setup()
-    end,
-  },
 }
 
 -- Initialize lazy with the plugins.
@@ -646,3 +669,22 @@ vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
     vim.bo.filetype = "markdown"
   end,
 })
+
+-- Harper Grammar Checker Configuration
+-- Configure diagnostics for Harper to be less intrusive
+vim.diagnostic.config({
+  virtual_text = {
+    source = "if_many",
+    prefix = "●",
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+})
+
+-- Custom diagnostic signs
+vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
+vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
+vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
+vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
