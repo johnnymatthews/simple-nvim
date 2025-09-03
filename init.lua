@@ -110,10 +110,8 @@ map("n", "<leader>hh", function()
   })
 end, { desc = "Apply Harper grammar suggestions" })
 
-map("n", "<leader>hd", vim.diagnostic.open_float, { desc = "Show Harper diagnostics" })
-
--- Toggle diagnostics visibility
-map("n", "<leader>ht", function()
+-- Toggle Harper diagnostics visibility
+map("n", "<leader>th", function()
   if vim.diagnostic.is_disabled() then
     vim.diagnostic.enable()
     print("Harper diagnostics enabled")
