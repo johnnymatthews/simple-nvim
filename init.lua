@@ -81,7 +81,7 @@ map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>") -- Move left one tab.
 map("n", "<C-q>", function() -- Close a tab.
   local bufnr = vim.api.nvim_get_current_buf()
   local buffers = vim.fn.getbufinfo({buflisted = 1})
-  
+
   -- If there are other buffers, switch to the next one before closing
   if #buffers > 1 then
     vim.cmd("BufferLineCycleNext")
@@ -283,9 +283,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-        "i",
-        "s",
-      }),
+          "i",
+          "s",
+        }),
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
@@ -295,9 +295,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-        "i",
-        "s",
-      }),
+          "i",
+          "s",
+        }),
     },
     sources = cmp.config.sources {
       { name = "nvim_lsp" },
@@ -364,10 +364,12 @@ local lspconfig_setup = function()
       },
     },
   }
-  -- Setup language servers.
-  local lspconfig = require "lspconfig"
 
-  lspconfig.lua_ls.setup {
+  -- Remove this line entirely:
+  -- local lspconfig = require "lspconfig"
+
+  -- Change from lspconfig.lua_ls.setup to:
+  vim.lsp.config.lua_ls = {
     capabilities = capabilities,
     settings = {
       Lua = {
@@ -377,7 +379,7 @@ local lspconfig_setup = function()
   }
 
   -- Setup Harper Language Server for grammar checking
-  lspconfig.harper_ls.setup {
+  vim.lsp.config.harper_ls = {
     capabilities = capabilities,
     filetypes = {
       "markdown",
@@ -394,10 +396,11 @@ local lspconfig_setup = function()
   local servers = { "ts_ls", "html", "cssls" }
 
   for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup {
+    vim.lsp.config[lsp] = {
       capabilities = capabilities,
     }
   end
+
 end
 
 -- Lazy.nvim Configuration
@@ -647,7 +650,7 @@ require("lazy").setup(plugins, lazy_config)
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-latte"
+vim.cmd "colorscheme catppuccin-mocha"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
