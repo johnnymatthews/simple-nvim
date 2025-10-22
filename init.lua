@@ -121,6 +121,9 @@ map("n", "<leader>th", function()
   end
 end, { desc = "Toggle Harper diagnostics" })
 
+-- Focus mode
+map("n", "<leader>tf", "<cmd> ZenMode <CR>", { desc = "Toggle Focus-mode" })
+
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
 vim.cmd('cnoreabbrev Q q')
@@ -634,6 +637,35 @@ local plugins = {
       "nvim-lua/plenary.nvim",
     },
     config = undotree_config,
+  },
+
+  -- Focus/zen mode for distraction-free writing
+  {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    config = function()
+      require("zen-mode").setup({
+        window = {
+          width = 120,
+          options = {
+            number = false,
+            relativenumber = false,
+          },
+        },
+        plugins = {
+          options = {
+            enabled = true,
+            laststatus = 0, -- hide statusline
+          },
+        },
+        on_open = function()
+          vim.opt.laststatus = 0
+        end,
+        on_close = function()
+          vim.opt.laststatus = 3 -- restore global statusline
+        end,
+      })
+    end,
   },
 }
 
