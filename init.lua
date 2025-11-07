@@ -650,6 +650,8 @@ local plugins = {
           options = {
             number = false,
             relativenumber = false,
+            wrap = true,
+            linebreak = true,
           },
         },
         plugins = {
