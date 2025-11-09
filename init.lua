@@ -404,6 +404,13 @@ local lspconfig_setup = function()
     }
   end
 
+  -- Enable all configured LSP servers
+  vim.lsp.enable("lua_ls")
+  vim.lsp.enable("harper_ls")
+  vim.lsp.enable("ts_ls")
+  vim.lsp.enable("html")
+  vim.lsp.enable("cssls")
+
 end
 
 -- Lazy.nvim Configuration
