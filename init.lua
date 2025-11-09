@@ -390,7 +390,12 @@ local lspconfig_setup = function()
     },
     settings = {
       ["harper-ls"] = {
-        userDictPath = "~/.config/harper-ls/user.dict",  -- Custom dictionary path
+        userDictPath = vim.fn.expand("~/.config/harper-ls/user.dict"),
+        diagnosticSeverity = "hint",  -- Use "hint" to make it less intrusive
+        dialect = "British",
+        linters = {
+          spell_check = true,
+        },
       },
     },
   }
@@ -669,9 +674,21 @@ local plugins = {
         },
         on_open = function()
           vim.opt.laststatus = 0
+          -- Disable Harper diagnostics in focus mode
+          if not vim.diagnostic.is_disabled() then
+            vim.diagnostic.disable()
+            vim.g.harper_was_enabled = true
+          else
+            vim.g.harper_was_enabled = false
+          end
         end,
         on_close = function()
           vim.opt.laststatus = 3 -- restore global statusline
+          -- Re-enable Harper diagnostics if they were enabled before
+          if vim.g.harper_was_enabled then
+            vim.diagnostic.enable()
+            vim.g.harper_was_enabled = false
+          end
         end,
       })
     end,
