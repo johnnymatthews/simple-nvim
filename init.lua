@@ -81,7 +81,7 @@ map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>") -- Move left one tab.
 map("n", "<C-q>", function() -- Close a tab.
   local bufnr = vim.api.nvim_get_current_buf()
   local buffers = vim.fn.getbufinfo({buflisted = 1})
-
+  
   -- If there are other buffers, switch to the next one before closing
   if #buffers > 1 then
     vim.cmd("BufferLineCycleNext")
@@ -100,6 +100,11 @@ map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cm
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
 
+-- Claude Code
+map("n", "<C-,>", "<cmd>ClaudeCode<CR>") -- Toggle Claude Code terminal.
+map("n", "<leader>cC", "<cmd>ClaudeCodeContinue<CR>") -- Continue conversation.
+map("n", "<leader>cV", "<cmd>ClaudeCodeVerbose<CR>") -- Verbose mode.
+
 -- Harper Grammar Checker keymaps
 map("n", "<leader>hh", function()
   vim.lsp.buf.code_action({
@@ -110,8 +115,10 @@ map("n", "<leader>hh", function()
   })
 end, { desc = "Apply Harper grammar suggestions" })
 
--- Toggle Harper diagnostics visibility
-map("n", "<leader>th", function()
+map("n", "<leader>hd", vim.diagnostic.open_float, { desc = "Show Harper diagnostics" })
+
+-- Toggle diagnostics visibility
+map("n", "<leader>ht", function()
   if vim.diagnostic.is_disabled() then
     vim.diagnostic.enable()
     print("Harper diagnostics enabled")
@@ -121,8 +128,27 @@ map("n", "<leader>th", function()
   end
 end, { desc = "Toggle Harper diagnostics" })
 
--- Focus mode
-map("n", "<leader>tf", "<cmd> ZenMode <CR>", { desc = "Toggle Focus-mode" })
+-- Add word under cursor to Harper dictionary
+map("n", "<leader>ha", function()
+  local word = vim.fn.expand("<cword>")
+  local dict_path = vim.fn.expand("~/.config/harper-ls/user.dict")
+  
+  -- Create directory if it doesn't exist
+  vim.fn.system("mkdir -p ~/.config/harper-ls")
+  
+  -- Check if word already exists in dictionary
+  local existing = vim.fn.system("grep -x '" .. word .. "' " .. dict_path)
+  if existing == "" then
+    -- Add word to dictionary
+    vim.fn.system("echo '" .. word .. "' >> " .. dict_path)
+    print("Added '" .. word .. "' to Harper dictionary")
+    
+    -- Restart Harper LSP to reload dictionary
+    vim.cmd("LspRestart harper_ls")
+  else
+    print("'" .. word .. "' already in Harper dictionary")
+  end
+end, { desc = "Add current word to Harper dictionary" })
 
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
@@ -286,9 +312,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-          "i",
-          "s",
-        }),
+        "i",
+        "s",
+      }),
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
@@ -298,9 +324,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-          "i",
-          "s",
-        }),
+        "i",
+        "s",
+      }),
     },
     sources = cmp.config.sources {
       { name = "nvim_lsp" },
@@ -367,12 +393,10 @@ local lspconfig_setup = function()
       },
     },
   }
+  -- Setup language servers.
+  local lspconfig = require "lspconfig"
 
-  -- Remove this line entirely:
-  -- local lspconfig = require "lspconfig"
-
-  -- Change from lspconfig.lua_ls.setup to:
-  vim.lsp.config.lua_ls = {
+  lspconfig.lua_ls.setup {
     capabilities = capabilities,
     settings = {
       Lua = {
@@ -382,20 +406,29 @@ local lspconfig_setup = function()
   }
 
   -- Setup Harper Language Server for grammar checking
-  vim.lsp.config.harper_ls = {
+  lspconfig.harper_ls.setup {
     capabilities = capabilities,
     filetypes = {
       "markdown",
       "text",
+      "gitcommit",
+      "html",
+      "javascript",
+      "typescript",
+      "typescriptreact",
+      "lua",
+      "python",
+      "go",
+      "rust",
+      "java",
+      "c",
+      "cpp",
     },
     settings = {
       ["harper-ls"] = {
-        userDictPath = vim.fn.expand("~/.config/harper-ls/user.dict"),
-        diagnosticSeverity = "hint",  -- Use "hint" to make it less intrusive
-        dialect = "British",
-        linters = {
-          spell_check = true,
-        },
+        userDictPath = "~/.config/harper-ls/user.dict",  -- Global dictionary
+        workspaceDictPath = "./harper-dict.txt",  -- Project-specific dictionary
+        fileDictPath = "~/.config/harper-ls/file-dicts/",  -- File-specific dictionaries
       },
     },
   }
@@ -404,18 +437,10 @@ local lspconfig_setup = function()
   local servers = { "ts_ls", "html", "cssls" }
 
   for _, lsp in ipairs(servers) do
-    vim.lsp.config[lsp] = {
+    lspconfig[lsp].setup {
       capabilities = capabilities,
     }
   end
-
-  -- Enable all configured LSP servers
-  vim.lsp.enable("lua_ls")
-  vim.lsp.enable("harper_ls")
-  vim.lsp.enable("ts_ls")
-  vim.lsp.enable("html")
-  vim.lsp.enable("cssls")
-
 end
 
 -- Lazy.nvim Configuration
@@ -651,52 +676,19 @@ local plugins = {
     config = undotree_config,
   },
 
-  -- Focus/zen mode for distraction-free writing
+  -- claude-code.nvim integration
   {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
+    "greggh/claude-code.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
-      require("zen-mode").setup({
-        window = {
-          width = 120,
-          options = {
-            number = false,
-            relativenumber = false,
-            wrap = true,
-            linebreak = true,
-          },
-        },
-        plugins = {
-          options = {
-            enabled = true,
-            laststatus = 0, -- hide statusline
-          },
-        },
-        on_open = function()
-          vim.opt.laststatus = 0
-          -- Disable Harper diagnostics in focus mode
-          if not vim.diagnostic.is_disabled() then
-            vim.diagnostic.disable()
-            vim.g.harper_was_enabled = true
-          else
-            vim.g.harper_was_enabled = false
-          end
-        end,
-        on_close = function()
-          vim.opt.laststatus = 3 -- restore global statusline
-          -- Re-enable Harper diagnostics if they were enabled before
-          if vim.g.harper_was_enabled then
-            vim.diagnostic.enable()
-            vim.g.harper_was_enabled = false
-          end
-        end,
-      })
+      require("claude-code").setup()
     end,
   },
 }
 
 -- Initialize lazy with the plugins.
 require("lazy").setup(plugins, lazy_config)
+lspconfig_setup()
 ------------------------------
 
 
@@ -736,14 +728,15 @@ vim.diagnostic.config({
     source = "if_many",
     prefix = "●",
   },
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "",
+    },
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
 })
-
--- Custom diagnostic signs
-vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
