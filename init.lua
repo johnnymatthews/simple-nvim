@@ -81,7 +81,7 @@ map("n", "<S-Tab>", "<cmd> BufferLineCyclePrev <CR>") -- Move left one tab.
 map("n", "<C-q>", function() -- Close a tab.
   local bufnr = vim.api.nvim_get_current_buf()
   local buffers = vim.fn.getbufinfo({buflisted = 1})
-  
+
   -- If there are other buffers, switch to the next one before closing
   if #buffers > 1 then
     vim.cmd("BufferLineCycleNext")
@@ -100,11 +100,6 @@ map("n", "<leader>fg", "<cmd>lua require('toggleterm.terminal').Terminal:new({cm
 -- Undo tree
 map("n", "<leader>u", "<cmd>lua require('undotree').toggle()<CR>") -- Show or hide Undotree on the left.
 
--- Claude Code
-map("n", "<C-,>", "<cmd>ClaudeCode<CR>") -- Toggle Claude Code terminal.
-map("n", "<leader>cC", "<cmd>ClaudeCodeContinue<CR>") -- Continue conversation.
-map("n", "<leader>cV", "<cmd>ClaudeCodeVerbose<CR>") -- Verbose mode.
-
 -- Harper Grammar Checker keymaps
 map("n", "<leader>hh", function()
   vim.lsp.buf.code_action({
@@ -115,10 +110,8 @@ map("n", "<leader>hh", function()
   })
 end, { desc = "Apply Harper grammar suggestions" })
 
-map("n", "<leader>hd", vim.diagnostic.open_float, { desc = "Show Harper diagnostics" })
-
--- Toggle diagnostics visibility
-map("n", "<leader>ht", function()
+-- Toggle Harper diagnostics visibility
+map("n", "<leader>th", function()
   if vim.diagnostic.is_disabled() then
     vim.diagnostic.enable()
     print("Harper diagnostics enabled")
@@ -128,27 +121,8 @@ map("n", "<leader>ht", function()
   end
 end, { desc = "Toggle Harper diagnostics" })
 
--- Add word under cursor to Harper dictionary
-map("n", "<leader>ha", function()
-  local word = vim.fn.expand("<cword>")
-  local dict_path = vim.fn.expand("~/.config/harper-ls/user.dict")
-  
-  -- Create directory if it doesn't exist
-  vim.fn.system("mkdir -p ~/.config/harper-ls")
-  
-  -- Check if word already exists in dictionary
-  local existing = vim.fn.system("grep -x '" .. word .. "' " .. dict_path)
-  if existing == "" then
-    -- Add word to dictionary
-    vim.fn.system("echo '" .. word .. "' >> " .. dict_path)
-    print("Added '" .. word .. "' to Harper dictionary")
-    
-    -- Restart Harper LSP to reload dictionary
-    vim.cmd("LspRestart harper_ls")
-  else
-    print("'" .. word .. "' already in Harper dictionary")
-  end
-end, { desc = "Add current word to Harper dictionary" })
+-- Focus mode
+map("n", "<leader>tf", "<cmd> ZenMode <CR>", { desc = "Toggle Focus-mode" })
 
 -- Make :W work like :w and :Q work like :q
 vim.cmd('cnoreabbrev W w')
@@ -312,9 +286,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-        "i",
-        "s",
-      }),
+          "i",
+          "s",
+        }),
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
@@ -324,9 +298,9 @@ local cmp_config = function()
           fallback()
         end
       end, {
-        "i",
-        "s",
-      }),
+          "i",
+          "s",
+        }),
     },
     sources = cmp.config.sources {
       { name = "nvim_lsp" },
@@ -368,9 +342,6 @@ local lspconfig_setup = function()
       vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
       vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
       vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-      -- vim.keymap.set("n", "<space>f", function()
-      --   vim.lsp.buf.format { async = true }
-      -- end, opts)
     end,
   })
 
@@ -393,54 +364,86 @@ local lspconfig_setup = function()
       },
     },
   }
-  -- Setup language servers.
-  local lspconfig = require "lspconfig"
 
-  lspconfig.lua_ls.setup {
-    capabilities = capabilities,
-    settings = {
-      Lua = {
-        diagnostics = { globals = { "vim" } },
-      },
-    },
-  }
+  -- Lua Language Server
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "lua",
+    callback = function()
+      vim.lsp.start({
+        name = "lua_ls",
+        cmd = { "lua-language-server" },
+        root_dir = vim.fs.root(0, { ".git", "init.lua" }),
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = { globals = { "vim" } },
+          },
+        },
+      })
+    end,
+  })
 
-  -- Setup Harper Language Server for grammar checking
-  lspconfig.harper_ls.setup {
-    capabilities = capabilities,
-    filetypes = {
-      "markdown",
-      "text",
-      "gitcommit",
-      "html",
-      "javascript",
-      "typescript",
-      "typescriptreact",
-      "lua",
-      "python",
-      "go",
-      "rust",
-      "java",
-      "c",
-      "cpp",
-    },
-    settings = {
-      ["harper-ls"] = {
-        userDictPath = "~/.config/harper-ls/user.dict",  -- Global dictionary
-        workspaceDictPath = "./harper-dict.txt",  -- Project-specific dictionary
-        fileDictPath = "~/.config/harper-ls/file-dicts/",  -- File-specific dictionaries
-      },
-    },
-  }
+  -- Harper Language Server for grammar checking
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "markdown", "text" },
+    callback = function()
+      vim.lsp.start({
+        name = "harper_ls",
+        cmd = { "harper-ls", "--stdio" },
+        root_dir = vim.fs.root(0, { ".git" }) or vim.fn.getcwd(),
+        capabilities = capabilities,
+        settings = {
+          ["harper-ls"] = {
+            userDictPath = vim.fn.expand("~/.config/harper-ls/user.dict"),
+            diagnosticSeverity = "hint",
+            dialect = "British",
+            linters = {
+              spell_check = true,
+            },
+          },
+        },
+      })
+    end,
+  })
 
-  -- setup multiple servers with same default options
-  local servers = { "ts_ls", "html", "cssls" }
+  -- TypeScript/JavaScript
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+    callback = function()
+      vim.lsp.start({
+        name = "ts_ls",
+        cmd = { "typescript-language-server", "--stdio" },
+        root_dir = vim.fs.root(0, { "package.json", "tsconfig.json", ".git" }),
+        capabilities = capabilities,
+      })
+    end,
+  })
 
-  for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup {
-      capabilities = capabilities,
-    }
-  end
+  -- HTML
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "html",
+    callback = function()
+      vim.lsp.start({
+        name = "html",
+        cmd = { "vscode-html-language-server", "--stdio" },
+        root_dir = vim.fs.root(0, { ".git" }) or vim.fn.getcwd(),
+        capabilities = capabilities,
+      })
+    end,
+  })
+
+  -- CSS
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "css", "scss", "less" },
+    callback = function()
+      vim.lsp.start({
+        name = "cssls",
+        cmd = { "vscode-css-language-server", "--stdio" },
+        root_dir = vim.fs.root(0, { ".git" }) or vim.fn.getcwd(),
+        capabilities = capabilities,
+      })
+    end,
+  })
 end
 
 -- Lazy.nvim Configuration
@@ -626,13 +629,6 @@ local plugins = {
     end,
   },
 
-  -- lsp
-  {
-    "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
-    config = lspconfig_setup,
-  },
-
   -- indent lines
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -676,18 +672,54 @@ local plugins = {
     config = undotree_config,
   },
 
-  -- claude-code.nvim integration
+  -- Focus/zen mode for distraction-free writing
   {
-    "greggh/claude-code.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
     config = function()
-      require("claude-code").setup()
+      require("zen-mode").setup({
+        window = {
+          width = 120,
+          options = {
+            number = false,
+            relativenumber = false,
+            wrap = true,
+            linebreak = true,
+          },
+        },
+        plugins = {
+          options = {
+            enabled = true,
+            laststatus = 0, -- hide statusline
+          },
+        },
+        on_open = function()
+          vim.opt.laststatus = 0
+          -- Disable Harper diagnostics in focus mode
+          if not vim.diagnostic.is_disabled() then
+            vim.diagnostic.disable()
+            vim.g.harper_was_enabled = true
+          else
+            vim.g.harper_was_enabled = false
+          end
+        end,
+        on_close = function()
+          vim.opt.laststatus = 3 -- restore global statusline
+          -- Re-enable Harper diagnostics if they were enabled before
+          if vim.g.harper_was_enabled then
+            vim.diagnostic.enable()
+            vim.g.harper_was_enabled = false
+          end
+        end,
+      })
     end,
   },
 }
 
 -- Initialize lazy with the plugins.
 require("lazy").setup(plugins, lazy_config)
+
+-- Setup LSP after plugins are loaded
 lspconfig_setup()
 ------------------------------
 
