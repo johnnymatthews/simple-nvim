@@ -398,7 +398,10 @@ local lspconfig_setup = function()
             diagnosticSeverity = "hint",
             dialect = "British",
             linters = {
-              spell_check = true,
+              SpellCheck = true,
+              Dashes = false,
+              AvoidCurses = false,
+              ExpandWith = false,
             },
           },
         },
