@@ -402,6 +402,7 @@ local lspconfig_setup = function()
               Dashes = false,
               AvoidCurses = false,
               ExpandWith = false,
+              NounCountability = false,
             },
           },
         },
@@ -561,16 +562,6 @@ local plugins = {
     "akinsho/bufferline.nvim",
     event = "BufReadPre",
     config = bufferline_config,
-  },
-
-  -- easy titlecase
-  {
-    "christoomey/vim-titlecase",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      vim.keymap.set("n", "<leader>tc", "gzz", { desc = "Title case current line" })
-      vim.keymap.set("v", "<leader>tc", "gz", { desc = "Title case selection" })
-    end,
   },
 
   -- statusline
