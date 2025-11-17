@@ -403,6 +403,7 @@ local lspconfig_setup = function()
               AvoidCurses = false,
               ExpandWith = false,
               NounCountability = false,
+              OrthographicConsistency = false,
             },
           },
         },
@@ -726,7 +727,7 @@ lspconfig_setup()
 vim.o.termguicolors = true
 
 -- Set overarching Catppuccin theme.
-vim.cmd "colorscheme catppuccin-mocha"
+vim.cmd "colorscheme catppuccin-latte"
 
 -- Force indentation to be 2 characters.
 vim.api.nvim_create_autocmd("FileType", {
